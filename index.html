@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的部落格</title>
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=N
+oto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+font-family: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+background: #fafafa;
+color: #333;
+line-height: 1.6;
+}
+.container {
+max-width: 900px;
+margin: 0 auto;
+padding: 24px;
+min-height: 100vh;
+}
+/* Header */
+header {
+text-align: center;
+margin-bottom: 40px;
+padding: 40px 20px;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+border-radius: 20px;
+color: white;
+box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+}
+header h1 {
+font-size: 2.5rem;
+font-weight: 800;
+margin: 0 0 12px 0;
+letter-spacing: -1px;
+}
+header p {
+font-size: 1.1rem;
+opacity: 0.9;
+margin: 0;
+}
+/* Search */
+.search-wrapper {
+position: sticky;
+top: 16px;
+z-index: 100;
+margin-bottom: 28px;
+}
+.search-box {
+background: white;
+border-radius: 16px;
+padding: 16px 24px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+display: flex;
+align-items: center;
+gap: 12px;
+border: 2px solid transparent;
+transition: border-color 0.3s;
+}
+.search-box:focus-within {
+border-color: #667eea;
+}
+.search-box input {
+flex: 1;
+border: none;
+outline: none;
+font-size: 1rem;
+background: transparent;
+color: #333;
+font-family: inherit;
+}
+.search-box input::placeholder {
+color: #aaa;
+}
+.result-count {
+color: #888;
+font-size: 0.85rem;
+white-space: nowrap;
+}
+/* Category Filters */
+.category-filters {
+display: flex;
+gap: 10px;
+margin-bottom: 28px;
+flex-wrap: wrap;
+justify-content: center;
+}
+.cat-btn {
+padding: 8px 18px;
+border-radius: 20px;
+border: 1px solid #e0e0e0;
+background: white;
+color: #555;
+font-weight: 500;
+cursor: pointer;
+transition: all 0.3s;
+font-size: 0.9rem;
+font-family: inherit;
+}
+.cat-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.cat-btn.active {
+background: #667eea !important;
+color: white !important;
+border-color: #667eea !important;
+}
+/* Posts Grid */
+.posts-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 24px;
+}
+.post-card {
+background: white;
+border-radius: 16px;
+overflow: hidden;
+box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+transition: all 0.3s ease;
+cursor: pointer;
+border: 1px solid #f0f0f0;
+}
+.post-card:hover {
+transform: translateY(-6px);
+box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
+border-color: #667eea;
+}
+.post-image {
+height: 160px;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+position: relative;
+overflow: hidden;
+}
+.post-image img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+opacity: 0.8;
+}
+.post-category-badge {
+position: absolute;
+top: 12px;
+left: 12px;
+background: rgba(255,255,255,0.95);
+padding: 4px 12px;
+border-radius: 20px;
+font-size: 0.75rem;
+font-weight: 700;
+color: #667eea;
+}
+.post-content {
+padding: 20px;
+}
+.post-meta {
+display: flex;
+align-items: center;
+gap: 8px;
+margin-bottom: 10px;
+color: #888;
+font-size: 0.8rem;
+}
+.post-title {
+margin: 0 0 10px 0;
+font-size: 1.1rem;
+color: #222;
+line-height: 1.4;
+font-weight: 700;
+}
+.post-excerpt {
+margin: 0 0 14px 0;
+color: #666;
+font-size: 0.9rem;
+line-height: 1.5;
+}
+.tag-pill {
+display: inline-block;
+padding: 4px 12px;
+background: #f0f4ff;
+color: #667eea;
+border-radius: 12px;
+font-size: 0.75rem;
+font-weight: 600;
+margin-right: 6px;
+margin-bottom: 6px;
+}
+.highlight {
+background: #fff3cd;
+padding: 0 2px;
+border-radius: 2px;
+}
+/* No Results */
+.no-results {
+display: none;
+text-align: center;
+padding: 60px 20px;
+color: #888;
+}
+.no-results-icon {
+font-size: 3rem;
+margin-bottom: 16px;
+}
+.no-results h3 {
+color: #555;
+margin-bottom: 8px;
+}
+/* Article Modal */
+.modal-overlay {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.6);
+z-index: 1000;
+overflow-y: auto;
+animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+.modal-content {
+background: white;
+max-width: 800px;
+margin: 40px auto;
+border-radius: 20px;
+overflow: hidden;
+box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+animation: slideUp 0.4s ease;
+}
+@keyframes slideUp {
+from { opacity: 0; transform: translateY(40px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.modal-header {
+height: 300px;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+position: relative;
+overflow: hidden;
+}
+.modal-header img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+opacity: 0.6;
+}
+.modal-close {
+position: absolute;
+top: 16px;
+right: 16px;
+background: rgba(255,255,255,0.9);
+border: none;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 1.2rem;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.3s;
+font-family: inherit;
+}
+.modal-close:hover {
+background: white;
+transform: scale(1.1);
+}
+.modal-header-info {
+position: absolute;
+bottom: 20px;
+left: 28px;
+right: 28px;
+}
+.modal-header-badge {
+background: rgba(255,255,255,0.95);
+padding: 6px 14px;
+border-radius: 20px;
+font-size: 0.8rem;
+font-weight: 700;
+color: #667eea;
+display: inline-block;
+margin-bottom: 12px;
+}
+.modal-header h1 {
+color: white;
+margin: 0 0 8px 0;
+font-size: 1.8rem;
+text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+.modal-header-meta {
+color: rgba(255,255,255,0.9);
+font-size: 0.9rem;
+}
+.modal-body {
+padding: 32px;
+}
+.modal-body .tags {
+display: flex;
+flex-wrap: wrap;
+margin-bottom: 24px;
+}
+.modal-body .article-content {
+color: #333;
+line-height: 1.8;
+font-size: 1.05rem;
+}
+.modal-body .article-content p {
+margin-bottom: 16px;
+}
+.modal-body .article-content ul {
+margin-bottom: 16px;
+padding-left: 24px;
+}
+.modal-body .article-content li {
+margin-bottom: 8px;
+}
+.modal-body .article-content strong {
+color: #222;
+}
+.modal-footer {
+margin-top: 40px;
+padding-top: 24px;
+border-top: 1px solid #eee;
+text-align: center;
+color: #888;
+}
+/* Responsive */
+@media (max-width: 600px) {
+header h1 { font-size: 1.8rem; }
+.posts-grid { grid-template-columns: 1fr; }
+.modal-content { margin: 0; border-radius: 0; min-height: 100vh; }
+.modal-header h1 { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<!-- Header -->
+<header>
+<h1>📝 我的部落格</h1>
+<p>記錄生活、分享知識、探索世界</p>
+</header>
+<!-- Search Bar -->
+<div class="search-wrapper">
+<div class="search-box">
+<span style="font-size: 1.3rem;">🔍</span>
+<input type="text" id="searchInput" placeholder="搜尋文章標題、內容或標籤..."
+oninput="filterPosts()">
+<span class="result-count" id="resultCount"></span>
+</div>
+</div>
+<!-- Category Filter -->
+<div class="category-filters" id="categoryFilters">
+<button class="cat-btn active" data-cat="all" onclick="filterByCategory('all')">全部
+</button>
+<button class="cat-btn" data-cat="tech" onclick="filterByCategory('tech')">💻 科技
+</button>
+<button class="cat-btn" data-cat="life" onclick="filterByCategory('life')">🌿 生活</button>
+<button class="cat-btn" data-cat="travel" onclick="filterByCategory('travel')">✈️ 旅遊
+</button>
+<button class="cat-btn" data-cat="food" onclick="filterByCategory('food')">🍜 美食
+</button>
+<button class="cat-btn" data-cat="dev" onclick="filterByCategory('dev')">⚡ 開發
+</button>
+</div>
+<!-- Posts Grid -->
+<div class="posts-grid" id="postsGrid"></div>
+<!-- No Results -->
+<div class="no-results" id="noResults">
+<div class="no-results-icon">🔍</div>
+<h3>找不到相關文章</h3>
+<p>試試其他關鍵字或分類吧！</p>
+</div>
+</div>
+<!-- Article Modal -->
+<div class="modal-overlay" id="articleModal" onclick="closeModal(event)">
+<div class="modal-content" onclick="event.stopPropagation()">
+<div id="modalInner"></div>
+</div>
+</div>
+<script>
+const posts = [
+{
+id: 1,
+title: "2026年最值得學習的程式語言",
+category: "tech",
+categoryLabel: "💻 科技",
+date: "2026-07-20",
+readTime: "8 分鐘",
+excerpt: "從 Rust 到 TypeScript，探索今年最熱門的技術趨勢與學習路徑...",
+content: "<p>2026 年，技術生態系持續演進。Rust 在系統程式設計領域穩坐寶座，而
+TypeScript 已經成為前端開發的標準配備。</p><p>本文將深入分析：</p><ul><li>Rust 的記
+憶體安全優勢</li><li>TypeScript 5.x 的新特性</li><li>Python 在 AI 領域的持續統治地位
+</li><li>Go 在雲端原生架構中的角色</li></ul><p>無論你是初學者還是資深開發者，選對語
+言都能讓你的職涯更上一層樓。</p>",
+tags: ["程式語言", "Rust", "TypeScript", "學習"],
+image:
+"https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&h=300&fit=crop
+"
+},
+{
+id: 2,
+title: "京都賞楓攻略：2026秋季必訪景點",
+category: "travel",
+categoryLabel: "✈️ 旅遊",
+date: "2026-07-18",
+readTime: "12 分鐘",
+excerpt: "清水寺、嵐山、貴船神社...帶你走訪京都最美的紅葉秘境...",
+content: "<p>京都的秋天是魔法般的季節。當楓葉轉紅，整座城市彷彿被火焰點燃。
+</p><p><strong>必訪景點：</strong></p><ul><li>清水寺 - 經典的清水舞台與紅葉絕景
+</li><li>嵐山 - 竹林小徑與渡月橋的秋日風情</li><li>貴船神社 - 參道兩旁的紅葉隧道</li><li>
+東福寺 - 通天橋上的壯觀紅葉海</li></ul><p>最佳賞楓時間：11 月中旬至 12 月初。</p>",
+tags: ["日本", "京都", "賞楓", "旅遊攻略"],
+image:
+"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&h=300&fit=crop
+"
+},
+{
+id: 3,
+title: "台北隱藏版牛肉麵：在地人推薦",
+category: "food",
+categoryLabel: "🍜 美食",
+date: "2026-07-15",
+readTime: "6 分鐘",
+excerpt: "跳過觀光客名店，這些巷弄裡的牛肉麵才是真正的台灣味...",
+content: "<p>台北的牛肉麵文化深厚，但真正的寶藏往往藏在不起眼的小巷中。
+</p><p><strong>推薦名單：</strong></p><ul><li>林東芳牛肉麵 - 藥燉風味的經典代表
+</li><li>永康牛肉麵 - 番茄紅燒的獨特風味</li><li>牛店精燉牛肉麵 - 精緻化的牛肉麵體驗
+</li></ul><p>每一碗都承載著台灣人的情感與記憶。</p>",
+tags: ["台北", "牛肉麵", "美食", "小吃"],
+image:
+"https://images.unsplash.com/photo-1552611052-33e04de081de?w=600&h=300&fit=crop"
+},
+{
+id: 4,
+title: "極簡生活的實踐心得",
+category: "life",
+categoryLabel: "🌿 生活",
+date: "2026-07-12",
+readTime: "10 分鐘",
+excerpt: "斷捨離一年後，我的生活發生了什麼變化？從物品到心靈的整理...",
+content: "<p>極簡生活不是擁有更少，而是為真正重要的事物留出空間。</p><p>過去一
+年，我實踐了：</p><ul><li>衣櫃只留下 33 件單品</li><li>數位斷捨離 - 清理 5000+ 封未讀郵
+件</li><li>建立「一進一出」的消費原則</li><li>每週一次的「無螢幕日」</li></ul><p>結果？更
+多時間、更少焦慮、更清晰的思緒。</p>",
+tags: ["極簡生活", "斷捨離", "心靈成長", "生活哲學"],
+image:
+"https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=600&h=300&fit=cro
+p"
+},
+{
+id: 5,
+title: "React 19 新特性完整解析",
+category: "dev",
+categoryLabel: "⚡ 開發",
+date: "2026-07-10",
+readTime: "15 分鐘",
+excerpt: "Server Components、Actions、use() Hook...React 19 帶來了哪些革命性更
+新？",
+content: "<p>React 19 是近年來最重要的版本更新之一。</p><p><strong>核心新特性：
+</strong></p><ul><li>React Server Components - 零 bundle size 的元件</li><li>Actions - 簡
+化表單與變異操作</li><li>use() Hook - 在渲染中讀取 Promise</li><li>Document Metadata
+API - 原生支援 meta 標籤</li></ul><p>這些改變將徹底改變我們建構 React 應用的方式。
+</p>",
+tags: ["React", "前端", "JavaScript", "Web開發"],
+image:
+"https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=300&fit=crop
+"
+},
+{
+id: 6,
+title: "遠端工作三年：效率與生活的平衡",
+category: "life",
+categoryLabel: "🌿 生活",
+date: "2026-07-08",
+readTime: "9 分鐘",
+excerpt: "從辦公室到居家辦公，我學到的時間管理與工作界線設定技巧...",
+content: "<p>遠端工作聽起來很美好，但真正的挑戰在於自律與界線。</p><p><strong>
+我的經驗分享：</strong></p><ul><li>建立專屬工作空間的重要性</li><li>番茄鐘工作法的實
+際應用</li><li>如何與團隊保持有效溝通</li><li>避免「永遠在線」的 burnout</li></ul><p>關
+鍵是：把工作時間和私人時間明確分開。</p>",
+tags: ["遠端工作", "效率", "生活平衡", "職場"],
+image:
+"https://images.unsplash.com/photo-1593642632823-8f78536788c6?w=600&h=300&fit=crop
+"
+},
+{
+id: 7,
+title: "AI 繪圖工具比較：Midjourney vs DALL-E 3",
+category: "tech",
+categoryLabel: "💻 科技",
+date: "2026-07-05",
+readTime: "7 分鐘",
+excerpt: "2026年最強大的兩款 AI 繪圖工具，哪一個更適合你的創作需求？",
+content: "<p>AI 繪圖在 2026 年已經進入成熟階段。</p><p><strong>Midjourney V7 特
+色：</strong></p><ul><li>極致的藝術風格與美感</li><li>社群驅動的靈感探索</li><li>複雜場
+景的細節處理</li></ul><p><strong>DALL-E 3 優勢：</strong></p><ul><li>與 ChatGPT 的無
+縫整合</li><li>更精準的文字理解</li><li>編輯功能的靈活性</li></ul>",
+tags: ["AI", "繪圖", "Midjourney", "DALL-E", "創作"],
+image:
+"https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=300&fit=cro
+p"
+},
+{
+id: 8,
+title: "沖繩自駕環島：7天完美行程",
+category: "travel",
+categoryLabel: "✈️ 旅遊",
+date: "2026-07-01",
+readTime: "11 分鐘",
+excerpt: "從那霸到古宇利島，帶你開著小車探索沖繩的藍色 paradise...",
+content: "<p>沖繩是台灣人最愛的度假勝地之一，而自駕環島是最自由的方式。
+</p><p><strong>7天行程規劃：</strong></p><ul><li>Day 1-2: 那霸市區與國際通
+</li><li>Day 3: 首里城與琉球文化</li><li>Day 4: 美麗海水族館與北部海岸</li><li>Day 5: 古
+宇利島與心形岩</li><li>Day 6: 美國村與日落海灘</li><li>Day 7: 瀨長島與溫泉放鬆
+</li></ul>",
+tags: ["沖繩", "自駕", "日本旅遊", "行程規劃"],
+image:
+"https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=600&h=300&fit=crop"
+}
+];
+let currentCategory = 'all';
+let searchQuery = '';
+function renderPosts() {
+const grid = document.getElementById('postsGrid');
+const noResults = document.getElementById('noResults');
+const resultCount = document.getElementById('resultCount');
+let filtered = posts.filter(post => {
+const matchCat = currentCategory === 'all' || post.category === currentCategory;
+const query = searchQuery.toLowerCase();
+const matchSearch = !query ||
+post.title.toLowerCase().includes(query) ||
+post.excerpt.toLowerCase().includes(query) ||
+post.tags.some(t => t.toLowerCase().includes(query));
+return matchCat && matchSearch;
+});
+if (filtered.length === 0) {
+grid.style.display = 'none';
+noResults.style.display = 'block';
+resultCount.textContent = '';
+} else {
+grid.style.display = 'grid';
+noResults.style.display = 'none';
+resultCount.textContent = '找到 ' + filtered.length + ' 篇文章';
+grid.innerHTML = filtered.map(post => {
+return '<div class="post-card" onclick="openArticle(' + post.id + ')">' +
+'<div class="post-image">' +
+'<img src="' + post.image + '" alt="' + post.title + '"
+onerror="this.style.display='none'">' +
+'<div class="post-category-badge">' + post.categoryLabel + '</div>' +
+'</div>' +
+'<div class="post-content">' +
+'<div class="post-meta">' +
+'<span>📅 ' + post.date + '</span>' +
+'<span>•</span>' +
+'<span>⏱️ ' + post.readTime + '</span>' +
+'</div>' +
+'<h3 class="post-title">' + highlightText(post.title, searchQuery) + '</h3>' +
+'<p class="post-excerpt">' + highlightText(post.excerpt, searchQuery) + '</p>' +
+'<div>' + post.tags.map(tag => '<span class="tag-pill">' + highlightText(tag,
+searchQuery) + '</span>').join('') + '</div>' +
+'</div>' +
+'</div>';
+}).join('');
+}
+}
+function highlightText(text, query) {
+if (!query) return text;
+var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+var regex = new RegExp('(' + escaped + ')', 'gi');
+return text.replace(regex, '<span class="highlight">$1</span>');
+}
+function filterPosts() {
+searchQuery = document.getElementById('searchInput').value;
+renderPosts();
+}
+function filterByCategory(cat) {
+currentCategory = cat;
+var buttons = document.querySelectorAll('.cat-btn');
+for (var i = 0; i < buttons.length; i++) {
+if (buttons[i].dataset.cat === cat) {
+buttons[i].classList.add('active');
+} else {
+buttons[i].classList.remove('active');
+}
+}
+renderPosts();
+}
+function openArticle(id) {
+var post = null;
+for (var i = 0; i < posts.length; i++) {
+if (posts[i].id === id) {
+post = posts[i];
+break;
+}
+}
+if (!post) return;
+var tagsHtml = '';
+for (var j = 0; j < post.tags.length; j++) {
+tagsHtml += '<span class="tag-pill">' + post.tags[j] + '</span>';
+}
+document.getElementById('modalInner').innerHTML =
+'<div class="modal-header">' +
+'<img src="' + post.image + '" alt="' + post.title + '" onerror="this.style.display='none'">'
++
+'<button class="modal-close" onclick="closeModal()">✕</button>' +
+'<div class="modal-header-info">' +
+'<div class="modal-header-badge">' + post.categoryLabel + '</div>' +
+'<h1>' + post.title + '</h1>' +
+'<div class="modal-header-meta">📅 ' + post.date + ' • ⏱️ ' + post.readTime +
+'</div>' +
+'</div>' +
+'</div>' +
+'<div class="modal-body">' +
+'<div class="tags">' + tagsHtml + '</div>' +
+'<div class="article-content">' + post.content + '</div>' +
+'<div class="modal-footer">' +
+'<p>感謝閱讀！🙏</p>' +
+'</div>' +
+'</div>';
+document.getElementById('articleModal').style.display = 'block';
+document.body.style.overflow = 'hidden';
+}
+function closeModal(e) {
+if (!e || e.target.id === 'articleModal') {
+document.getElementById('articleModal').style.display = 'none';
+document.body.style.overflow = '';
+}
+}
+// Initialize
+renderPosts();
+</script>
+</body>
+</html>
